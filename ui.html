@@ -9,7 +9,7 @@
       margin: 0;
       padding: 0;
     }
-
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: linear-gradient(135deg, #001E3F 0%, #000C1F 100%);
@@ -18,7 +18,7 @@
       flex-direction: column;
       color: white;
     }
-
+    
     .header {
       display: flex;
       align-items: center;
@@ -28,19 +28,19 @@
       backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-
+    
     .logo {
       height: 30px;
       display: flex;
       align-items: center;
     }
-
+    
     .header-title {
       font-size: 18px;
       font-weight: 600;
       color: white;
     }
-
+    
     .messages-container {
       flex: 1;
       overflow-y: auto;
@@ -49,7 +49,7 @@
       flex-direction: column;
       gap: 16px;
     }
-
+    
     .welcome-state {
       display: flex;
       flex-direction: column;
@@ -59,24 +59,24 @@
       text-align: center;
       padding: 40px 24px;
     }
-
+    
     .welcome-state.hidden {
       display: none;
     }
-
+    
     .welcome-title {
       font-size: 20px;
       font-weight: 600;
       margin-bottom: 8px;
       color: white;
     }
-
+    
     .welcome-subtitle {
       font-size: 16px;
       color: rgba(255, 255, 255, 0.7);
       margin-bottom: 32px;
     }
-
+    
     .suggestion-buttons {
       display: flex;
       flex-direction: column;
@@ -84,7 +84,7 @@
       width: 100%;
       max-width: 320px;
     }
-
+    
     .suggestion-btn {
       padding: 12px 16px;
       background: rgba(255, 255, 255, 0.1);
@@ -96,30 +96,30 @@
       text-align: left;
       transition: all 0.2s ease;
     }
-
+    
     .suggestion-btn:hover {
       background: rgba(255, 255, 255, 0.15);
       border-color: rgba(255, 255, 255, 0.3);
       transform: translateY(-1px);
     }
-
+    
     .message {
       display: flex;
       margin-bottom: 16px;
     }
-
+    
     .message.user {
       justify-content: flex-end;
     }
-
+    
     .message.ai {
       justify-content: flex-start;
     }
-
+    
     .message.system {
       justify-content: flex-start;
     }
-
+    
     .message-bubble {
       max-width: 85%;
       padding: 12px 16px;
@@ -128,27 +128,27 @@
       line-height: 1.5;
       white-space: pre-wrap;
     }
-
+    
     .message.user .message-bubble {
       background: #003366;
       color: white;
       border-bottom-right-radius: 4px;
     }
-
+    
     .message.ai .message-bubble {
       background: rgba(255, 255, 255, 0.1);
       color: white;
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-bottom-left-radius: 4px;
     }
-
+    
     .message.system .message-bubble {
       background: rgba(0, 30, 63, 0.2);
       color: #7BB3F0;
       border: 1px solid rgba(0, 30, 63, 0.4);
       border-bottom-left-radius: 4px;
     }
-
+    
     .loading-message {
       display: flex;
       align-items: center;
@@ -162,7 +162,7 @@
       color: rgba(255, 255, 255, 0.8);
       max-width: 85%;
     }
-
+    
     .spinner {
       width: 16px;
       height: 16px;
@@ -171,25 +171,25 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-
+    
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-
+    
     .input-section {
       padding: 20px 24px 24px;
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(10px);
       border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
-
+    
     .input-container {
       display: flex;
       gap: 12px;
       align-items: flex-end;
     }
-
+    
     .message-input {
       flex: 1;
       padding: 12px 16px;
@@ -203,16 +203,16 @@
       min-height: 44px;
       max-height: 120px;
     }
-
+    
     .message-input::placeholder {
       color: rgba(255, 255, 255, 0.5);
     }
-
+    
     .message-input:focus {
       border-color: #4A90E2;
       box-shadow: 0 0 0 1px #4A90E2;
     }
-
+    
     .send-btn {
       padding: 12px;
       background: #0077FF;
@@ -227,43 +227,43 @@
       height: 44px;
       transition: all 0.2s ease;
     }
-
+    
     .send-btn:hover {
       background: #0066DD;
       transform: scale(1.05);
     }
-
+    
     .send-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
       transform: none;
     }
-
+    
     .input-help {
       font-size: 12px;
       color: rgba(255, 255, 255, 0.5);
       margin-top: 8px;
       text-align: center;
     }
-
+    
     .hidden {
       display: none !important;
     }
-
+    
     /* Scrollbar styling */
     .messages-container::-webkit-scrollbar {
       width: 4px;
     }
-
+    
     .messages-container::-webkit-scrollbar-track {
       background: rgba(255, 255, 255, 0.1);
     }
-
+    
     .messages-container::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.3);
       border-radius: 2px;
     }
-
+    
     .messages-container::-webkit-scrollbar-thumb:hover {
       background: rgba(255, 255, 255, 0.5);
     }
@@ -294,7 +294,7 @@
     <div id="welcome-state" class="welcome-state">
       <h2 class="welcome-title">Got a question? Just ask.</h2>
       <p class="welcome-subtitle">Search tokens, components, and guidelines directly in Figma — no context switching.</p>
-
+      
       <div class="suggestion-buttons">
         <button class="suggestion-btn" data-suggestion="What colors should I use for error states?">What colors should I use for error states?</button>
         <button class="suggestion-btn" data-suggestion="Show me the button component guidelines">Show me the button component guidelines</button>
@@ -306,9 +306,9 @@
 
   <div class="input-section">
     <div class="input-container">
-      <textarea
-        id="message-input"
-        class="message-input"
+      <textarea 
+        id="message-input" 
+        class="message-input" 
         placeholder="Ask about the Nova Design System..."
         rows="1"
       ></textarea>
@@ -503,17 +503,17 @@
     // Initialize event listeners
     function init() {
       console.log('Initializing Ask Nova...');
-
+      
       // Send button and input handlers
       if (sendBtn) {
         sendBtn.addEventListener('click', sendMessage);
       }
-
+      
       if (messageInput) {
         messageInput.addEventListener('keydown', handleKeyPress);
         messageInput.addEventListener('input', autoResizeTextarea);
       }
-
+      
       // Suggestion button handlers
       document.addEventListener('click', function(e) {
         if (e.target.classList.contains('suggestion-btn')) {
@@ -525,23 +525,23 @@
           }
         }
       });
-
+      
       console.log('All event listeners initialized');
     }
 
     async function sendMessage() {
       const message = messageInput.value.trim();
-
+      
       if (!message || isLoading) {
         return;
       }
 
       console.log('Sending message:', message);
-
+      
       addMessage('user', message);
       messageInput.value = '';
       autoResizeTextarea();
-
+      
       showLoading();
       isLoading = true;
       sendBtn.disabled = true;
@@ -567,7 +567,7 @@ User question: "${message}"
 
 Provide helpful, specific answers about:
 - Color tokens and usage
-- Typography scales and hierarchy
+- Typography scales and hierarchy  
 - Spacing and layout guidelines
 - Component variants and best practices
 - Implementation guidance
@@ -584,23 +584,23 @@ Format your response to be scannable with clear headings and bullet points when 
 
         const data = await response.json();
         console.log('API response received successfully');
-
+        
         hideLoading();
-
+        
         if (data.content && data.content[0] && data.content[0].text) {
           addMessage('ai', data.content[0].text);
         } else {
           throw new Error('Invalid response format from API');
         }
-
+        
       } catch (error) {
         console.error('Error sending message:', error);
         hideLoading();
-
+        
         // Fallback to local responses if API fails
         const localResponse = generateLocalResponse(message);
         addMessage('ai', localResponse);
-
+        
       } finally {
         isLoading = false;
         sendBtn.disabled = false;
@@ -610,14 +610,14 @@ Format your response to be scannable with clear headings and bullet points when 
 
     function generateLocalResponse(message) {
       const messageLower = message.toLowerCase();
-
+      
       if (messageLower.includes('color') && messageLower.includes('error')) {
         return `**Error State Colors**
 
 For error states in the Nova Design System:
 
 • **Primary Error**: #dc2626 (error-600)
-• **Background**: #fef2f2 (error-50)
+• **Background**: #fef2f2 (error-50)  
 • **Border**: #dc2626 (error-600)
 • **Text**: #991b1b (error-800)
 
@@ -627,7 +627,7 @@ For error states in the Nova Design System:
 - Ensure 4.5:1 contrast ratio minimum
 - Pair with clear, actionable error messages`;
       }
-
+      
       if (messageLower.includes('button')) {
         return `**Button Component Guidelines**
 
@@ -637,7 +637,7 @@ Nova provides 4 button variants:
 - Save, Submit, Continue actions
 - Only one per section
 
-**Secondary** (#f3f4f6)
+**Secondary** (#f3f4f6) 
 - Cancel, Back actions
 - Supporting the primary action
 
@@ -651,7 +651,7 @@ Nova provides 4 button variants:
 
 **Sizes:**
 - Small: 32px height
-- Medium: 40px height
+- Medium: 40px height  
 - Large: 48px height
 
 **Best Practices:**
@@ -659,14 +659,14 @@ Nova provides 4 button variants:
 - Primary button on the right
 - Consistent sizing in context`;
       }
-
+      
       if (messageLower.includes('spacing') || messageLower.includes('margin')) {
         return `**Spacing Scale**
 
 Nova uses an 8px grid system:
 
 • **XS**: 4px - Fine details, tight spacing
-• **SM**: 8px - Base unit, standard spacing
+• **SM**: 8px - Base unit, standard spacing  
 • **MD**: 16px - Component spacing
 • **LG**: 24px - Section spacing
 • **XL**: 32px - Large gaps
@@ -679,7 +679,7 @@ Nova uses an 8px grid system:
 - Larger spacing creates hierarchy
 - Maintain consistent rhythm`;
       }
-
+      
       if (messageLower.includes('typography') || messageLower.includes('font')) {
         return `**Typography System**
 
@@ -687,7 +687,7 @@ Nova uses an 8px grid system:
 • **5XL**: 48px - Hero headlines
 • **4XL**: 36px - Page titles
 • **3XL**: 30px - Section headers
-• **2XL**: 24px - Subsection titles
+• **2XL**: 24px - Subsection titles  
 • **XL**: 20px - Component headers
 • **LG**: 18px - Large body text
 • **Base**: 16px - Body text
@@ -705,7 +705,7 @@ Nova uses an 8px grid system:
 • Normal (1.5) - Body text
 • Relaxed (1.75) - Long-form content`;
       }
-
+      
       // Default response
       return `**Welcome to Nova Design System!**
 
@@ -715,7 +715,7 @@ I can help you with:
 - Primary, neutral, error, warning, success palettes
 - Token values and usage guidelines
 
-**📝 Typography**
+**📝 Typography**  
 - Font scales from XS (12px) to 5XL (48px)
 - Weight and line-height recommendations
 
@@ -738,21 +738,21 @@ What would you like to know more about?`;
 
     function addMessage(type, content) {
       messages.push({ type, content });
-
+      
       const messageDiv = document.createElement('div');
       messageDiv.className = `message ${type}`;
-
+      
       const bubbleDiv = document.createElement('div');
       bubbleDiv.className = 'message-bubble';
       bubbleDiv.textContent = content;
-
+      
       messageDiv.appendChild(bubbleDiv);
       messagesContainer.appendChild(messageDiv);
-
+      
       if (welcomeState) {
         welcomeState.classList.add('hidden');
       }
-
+      
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
@@ -792,7 +792,7 @@ What would you like to know more about?`;
     } else {
       init();
     }
-
+    
     console.log('Ask Nova loaded successfully');
   </script>
 </body>
