@@ -52,6 +52,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      display: none;
     }
     
     .knowledge-icon {
@@ -310,6 +311,30 @@
     .messages-container::-webkit-scrollbar-thumb:hover {
       background: rgba(255, 255, 255, 0.5);
     }
+</style>
+  <style>
+    .nova-domain {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: #0077FF;
+      text-transform: uppercase;
+      margin-left: auto;
+      user-select: text;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    /* When knowledge-status is hidden, push nova-domain to the right */
+    /* (no longer needed, handled by margin-left:auto above) */
+    .nova-domain:hover {
+      color: #0066DD;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -317,7 +342,6 @@
     <div class="spinner" style="width: 32px; height: 32px; border-width: 3px;"></div>
     <div class="loading-text">Loading design system knowledge...</div>
   </div>
-
   <div class="header">
     <div class="logo">
       <svg width="138" height="30" viewBox="0 0 138 30" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -336,13 +360,13 @@
         </defs>
       </svg>
     </div>
-    
     <div class="knowledge-status">
       <svg class="knowledge-icon" viewBox="0 0 24 24">
         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
       </svg>
       <span>Knowledge Ready</span>
     </div>
+    <a class="nova-domain" href="https://nova.icis.com/" target="_blank" rel="noopener noreferrer">NOVA.ICIS.COM</a>
   </div>
 
   <div id="messages-container" class="messages-container">
