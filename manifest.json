@@ -1,13 +1,12 @@
 {
-  "name": "AI Design System Assistant (Free)",
-  "id": "design-system-ai-free",
+  "name": "Ask Nova",
+  "id": "ask-nova",
   "api": "1.0.0", 
   "main": "code.js",
   "ui": "ui.html",
   "editorType": ["figma"],
   "networkAccess": {
     "allowedDomains": [
-      "https://api.groq.com",
       "https://cdnjs.cloudflare.com"
     ]
   }
