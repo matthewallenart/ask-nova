@@ -654,23 +654,34 @@ ANIMATIONS:
     // Initialize the plugin
     function init() {
       console.log('Initializing Ask Nova...');
-      
+
       // Simulate loading the knowledge base
       setTimeout(() => {
         loadingOverlay.classList.add('hidden');
         console.log('Knowledge base loaded, length:', window.DESIGN_SYSTEM_KNOWLEDGE.length);
       }, 1500);
-      
+
       // Send button and input handlers
       if (sendBtn) {
         sendBtn.addEventListener('click', sendMessage);
       }
-      
+
       if (messageInput) {
         messageInput.addEventListener('keydown', handleKeyPress);
         messageInput.addEventListener('input', autoResizeTextarea);
       }
-      
+
+      // Logo click handler to send a reload message to parent (Figma plugin host)
+      const logoDiv = document.querySelector('.logo');
+      if (logoDiv) {
+        logoDiv.style.cursor = 'pointer';
+        logoDiv.addEventListener('click', () => {
+          if (window.parent) {
+            window.parent.postMessage({ pluginMessage: { type: 'reload' } }, '*');
+          }
+        });
+      }
+
       // Suggestion button handlers
       document.addEventListener('click', function(e) {
         if (e.target.classList.contains('suggestion-btn')) {
@@ -682,7 +693,7 @@ ANIMATIONS:
           }
         }
       });
-      
+
       console.log('All event listeners initialized');
     }
 
