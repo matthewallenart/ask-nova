@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+  <title>Ask Nova</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #001E3F 0%, #000C1F 100%);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: white;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 20px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo {
+      height: 30px;
+      display: flex;
+      align-items: center;
+    }
+
+    .nova-domain {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: #0077FF;
+      text-transform: uppercase;
+      margin-left: auto;
+      user-select: text;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      height: 100%;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nova-domain:hover {
+      color: #0066DD;
+      text-decoration: underline;
+    }
+
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .welcome-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      padding: 40px 24px;
+    }
+
+    .welcome-state.hidden {
+      display: none;
+    }
+
+    .welcome-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: white;
+    }
+
+    .welcome-subtitle {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 32px;
+    }
+
+    .suggestion-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .suggestion-btn {
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .suggestion-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .message {
+      display: flex;
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: messageSlideIn 0.3s ease-out forwards;
+    }
+
+    @keyframes messageSlideIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .message.ai {
+      justify-content: flex-start;
+    }
+
+    .message-bubble {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .message.user .message-bubble {
+      background: #003366;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.ai .message-bubble {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom-left-radius: 4px;
+    }
+
+    .loading-message {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 85%;
+    }
+
+    .thinking-dots {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .thinking-dot {
+      width: 6px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      animation: thinkingPulse 1.4s ease-in-out infinite both;
+    }
+
+    .thinking-dot:nth-child(1) { animation-delay: -0.32s; }
+    .thinking-dot:nth-child(2) { animation-delay: -0.16s; }
+    .thinking-dot:nth-child(3) { animation-delay: 0s; }
+
+    @keyframes thinkingPulse {
+      0%, 80%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+      40% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .input-section {
+      padding: 20px 24px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .input-container {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .message-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      font-size: 14px;
+      resize: none;
+      outline: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      min-height: 44px;
+      max-height: 120px;
+      transition: border-color 0.2s ease;
+    }
+
+    .message-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .message-input:focus {
+      border-color: #4A90E2;
+      box-shadow: 0 0 0 1px #4A90E2;
+    }
+
+    .send-btn {
+      padding: 12px;
+      background: #0077FF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      transition: all 0.2s ease;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      background: #0066DD;
+      transform: scale(1.05);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Scrollbar styling */
+    .messages-container::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .messages-container::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .messages-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <svg width="138" height="30" viewBox="0 0 138 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.5454 23L26.7481 4.12788H32.3174L38.4409 23H33.9802L32.6869 18.8033H25.8507L24.5574 23H20.5454ZM29.282 7.61196L26.7745 15.7679H31.7631L29.282 7.61196ZM45.6922 23.2903C41.9706 23.2903 39.8062 21.6539 39.6742 18.6713H43.2375C43.3959 19.9118 44.0029 20.6245 45.6658 20.6245C47.1439 20.6245 47.8302 20.0702 47.8302 19.12C47.8302 18.1698 47.0119 17.7739 45.0323 17.4835C41.3635 16.9292 39.9382 15.8735 39.9382 13.1812C39.9382 10.3042 42.5776 8.8789 45.4019 8.8789C48.4636 8.8789 50.76 9.98747 51.1031 13.1548H47.5926C47.3814 12.0199 46.748 11.492 45.4282 11.492C44.1877 11.492 43.475 12.0726 43.475 12.9173C43.475 13.7883 44.1349 14.1314 46.1409 14.4218C49.5986 14.9233 51.499 15.7943 51.499 18.7505C51.499 21.7331 49.3346 23.2903 45.6922 23.2903ZM53.9261 23V2.94012H57.7533V15.0288L62.1876 9.19564H66.2523L61.2374 15.4775L66.6482 23H62.3195L57.7533 16.4805V23H53.9261ZM74.7611 23V4.12788H79.7233L86.9026 16.5597V4.12788H90.7034V23H86.4275L78.5619 9.56516V23H74.7611ZM100.731 20.3869C102.869 20.3869 104.11 18.8033 104.11 16.1902V16.0054C104.11 13.366 102.869 11.7823 100.731 11.7823C98.6199 11.7823 97.353 13.3132 97.353 15.9526V16.1638C97.353 18.8033 98.5671 20.3869 100.731 20.3869ZM100.705 23.2903C96.5875 23.2903 93.4466 20.5453 93.4466 16.243V16.0318C93.4466 11.7031 96.5875 8.8789 100.731 8.8789C104.875 8.8789 107.99 11.6503 107.99 15.9526V16.1638C107.99 20.5189 104.849 23.2903 100.705 23.2903ZM113.762 23L108.721 9.19564H112.812L116.111 19.0672L119.384 9.19564H123.079L118.064 23H113.762ZM128.48 23.2903C125.973 23.2903 123.861 22.0762 123.861 19.1728C123.861 15.9526 126.817 14.7385 131.04 14.7385H132.598V14.1842C132.598 12.5477 132.096 11.6503 130.354 11.6503C128.85 11.6503 128.163 12.4158 128.005 13.6035H124.389C124.626 10.3306 127.213 8.8789 130.592 8.8789C133.97 8.8789 136.372 10.2514 136.372 13.9994V23H132.65V21.3371C131.859 22.4457 130.644 23.2903 128.48 23.2903ZM129.615 20.6245C131.304 20.6245 132.598 19.7007 132.598 18.1698V17.0084H131.119C128.902 17.0084 127.609 17.4835 127.609 18.9616C127.609 19.9646 128.216 20.6245 129.615 20.6245Z" fill="white"/>
+        <path d="M3.31997 11.7413L4.09067 14.7408C4.20924 14.9856 4.44638 15.1693 4.74281 15.1693C4.97995 15.1693 5.21709 14.9856 5.33566 14.7408L6.16565 11.7413L9.01134 10.9455C9.24848 10.823 9.48562 10.5782 9.48562 10.2721C9.48562 10.0273 9.24848 9.7824 9.01134 9.65997L6.16565 8.80296L5.33566 5.86466C5.21709 5.6198 4.97995 5.37494 4.74281 5.37494C4.44638 5.37494 4.20924 5.6198 4.09067 5.86466L3.31997 8.80296L0.414996 9.65997C0.177855 9.7824 0 10.0273 0 10.2721C0 10.5782 0.177855 10.823 0.414996 10.9455L3.31997 11.7413Z" fill="url(#paint0_linear_11_56)"/>
+        <path d="M7.94421 19.638L10.197 20.3113L10.8492 22.6375C10.9085 22.8823 11.1456 23.0048 11.3827 23.0048C11.5606 23.0048 11.7977 22.8823 11.857 22.6375L12.5092 20.3113L14.762 19.638C14.9991 19.5767 15.177 19.3319 15.177 19.087C15.177 18.9034 14.9991 18.6585 14.762 18.5973L12.5092 17.924L11.857 15.5978C11.7977 15.3529 11.5606 15.1693 11.3827 15.1693C11.1456 15.1693 10.9085 15.3529 10.8492 15.5978L10.197 17.924L7.94421 18.5973C7.70707 18.6585 7.58849 18.9034 7.58849 19.087C7.58849 19.3319 7.70707 19.5767 7.94421 19.638Z" fill="url(#paint1_linear_11_56)"/>
+        <defs>
+          <linearGradient id="paint0_linear_11_56" x1="15.177" y1="14.2207" x2="-8.64715e-08" y2="14.2207" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#00DE96"/>
+            <stop offset="1" stop-color="#008FF7"/>
+          </linearGradient>
+          <linearGradient id="paint1_linear_11_56" x1="15.177" y1="14.2207" x2="-8.64715e-08" y2="14.2207" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#00DE96"/>
+            <stop offset="1" stop-color="#008FF7"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <a class="nova-domain" href="https://nova.icis.com/" target="_blank" rel="noopener noreferrer">NOVA.ICIS.COM</a>
+  </div>
+
+  <div id="messages-container" class="messages-container">
+    <div id="welcome-state" class="welcome-state">
+      <h2 class="welcome-title">Got a question? Just ask.</h2>
+      <p class="welcome-subtitle">Search tokens, components, and guidelines from the Nova Design System directly in Figma.</p>
+
+      <div class="suggestion-buttons">
+        <button class="suggestion-btn" onclick="fillInput('What colors should I use for error states?')">What colors should I use for error states?</button>
+        <button class="suggestion-btn" onclick="fillInput('Show me the button component guidelines')">Show me the button component guidelines</button>
+        <button class="suggestion-btn" onclick="fillInput('What\'s the spacing scale for margins?')">What's the spacing scale for margins?</button>
+        <button class="suggestion-btn" onclick="fillInput('How do I implement the typography hierarchy?')">How do I implement the typography hierarchy?</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <div class="input-container">
+      <textarea
+        id="message-input"
+        class="message-input"
+        placeholder="Ask away..."
+        rows="1"
+        maxlength="1000"
+      ></textarea>
+      <button id="send-btn" class="send-btn" onclick="sendMessage()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    console.log('Script starting...');
+
+    // Enhanced knowledge base (unchanged for security - this is static content)
+    const DESIGN_SYSTEM_KNOWLEDGE = `
+COLORS:
+Primary Colors:
+- Primary Blue: #2563eb (Blue 600) - Used for primary actions, links, and key UI elements
+- Primary Dark: #1d4ed8 (Blue 700) - Used for hover states and emphasis
+- Primary Light: #93c5fd (Blue 300) - Used for backgrounds and subtle accents
+
+Secondary Colors:
+- Success Green: #10b981 (Green 500) - Used for success states and positive actions
+- Warning Amber: #f59e0b (Amber 500) - Used for warning states and caution
+- Error Red: #ef4444 (Red 500) - Used for error states and destructive actions
+- Info Blue: #3b82f6 (Blue 500) - Used for informational content
+
+Neutral Colors:
+- Gray 900: #111827 - Primary text color
+- Gray 700: #374151 - Secondary text color
+- Gray 500: #6b7280 - Placeholder text and subtle content
+- Gray 300: #d1d5db - Border colors and dividers
+- Gray 100: #f3f4f6 - Background colors and cards
+- White: #ffffff - Primary background color
+
+TYPOGRAPHY:
+Font Family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif
+
+Heading Scale:
+- H1: 32px (2rem), Weight: 700, Line Height: 1.2
+- H2: 24px (1.5rem), Weight: 600, Line Height: 1.3
+- H3: 20px (1.25rem), Weight: 600, Line Height: 1.4
+- H4: 18px (1.125rem), Weight: 600, Line Height: 1.4
+- H5: 16px (1rem), Weight: 600, Line Height: 1.5
+- H6: 14px (0.875rem), Weight: 600, Line Height: 1.5
+
+Body Text:
+- Large: 18px (1.125rem), Weight: 400, Line Height: 1.6
+- Base: 16px (1rem), Weight: 400, Line Height: 1.5
+- Small: 14px (0.875rem), Weight: 400, Line Height: 1.4
+- Extra Small: 12px (0.75rem), Weight: 400, Line Height: 1.3
+
+SPACING SYSTEM:
+Base unit: 8px
+Scale: 4px (0.5), 8px (1), 12px (1.5), 16px (2), 24px (3), 32px (4), 48px (6), 64px (8), 96px (12), 128px (16)
+
+Usage Guidelines:
+- Use 8px for small gaps between related elements
+- Use 16px for standard spacing between components
+- Use 24px for medium section spacing
+- Use 32px+ for large section breaks
+
+COMPONENTS:
+
+BUTTONS:
+Primary Button:
+- Background: Primary Blue (#2563eb)
+- Text: White (#ffffff)
+- Padding: 12px 24px
+- Border radius: 6px
+- Font: 16px, Weight 500
+- Hover: Primary Dark (#1d4ed8)
+
+Secondary Button:
+- Background: Transparent
+- Text: Primary Blue (#2563eb)
+- Border: 1px solid Primary Blue
+- Padding: 12px 24px
+- Border radius: 6px
+- Font: 16px, Weight 500
+- Hover: Light blue background
+
+Outline Button:
+- Background: Transparent
+- Text: Gray 700 (#374151)
+- Border: 1px solid Gray 300 (#d1d5db)
+- Padding: 12px 24px
+- Border radius: 6px
+- Font: 16px, Weight 500
+- Hover: Gray 100 background
+
+Button Sizes:
+- Small: 8px 16px padding, 14px font
+- Medium: 12px 24px padding, 16px font (default)
+- Large: 16px 32px padding, 18px font
+
+FORM ELEMENTS:
+Input Fields:
+- Padding: 12px 16px
+- Border: 1px solid Gray 300 (#d1d5db)
+- Border radius: 6px
+- Font: 16px
+- Focus: Blue border with shadow
+- Error: Red border
+
+Labels:
+- Font: 14px, Weight 500
+- Color: Gray 700 (#374151)
+- Margin bottom: 8px
+
+CARDS:
+Default Card:
+- Background: White (#ffffff)
+- Border: 1px solid Gray 200 (#e5e7eb)
+- Border radius: 8px
+- Padding: 24px
+- Shadow: 0 1px 3px rgba(0,0,0,0.1)
+
+Elevated Card:
+- Background: White (#ffffff)
+- Border: None
+- Border radius: 12px
+- Padding: 24px
+- Shadow: 0 4px 6px rgba(0,0,0,0.1)
+
+GRID SYSTEM:
+Container max-width: 1200px
+Columns: 12 column grid
+Gutter: 24px between columns
+Breakpoints:
+- Mobile: 0px - 768px
+- Tablet: 768px - 1024px
+- Desktop: 1024px+
+
+ACCESSIBILITY:
+- Minimum contrast ratio: 4.5:1 for normal text
+- Minimum contrast ratio: 3:1 for large text
+- Focus indicators must be visible
+- Touch targets minimum 44px
+- Text must be resizable up to 200%
+
+USAGE EXAMPLES:
+Navigation:
+- Use Primary Blue for active states
+- Use Gray 500 for inactive links
+- Maintain 44px minimum touch targets
+
+Error Handling:
+- Use Error Red for error messages
+- Include clear, actionable error text
+- Show errors inline when possible
+
+Loading States:
+- Use subtle animations
+- Provide progress indicators for long operations
+- Maintain layout stability during loading
+
+MODALS:
+- Maximum width: 600px
+- Centered vertically and horizontally
+- Backdrop: Semi-transparent black (rgba(0,0,0,0.5))
+- Border radius: 12px
+- Padding: 32px
+- Shadow: 0 20px 25px rgba(0,0,0,0.1)
+
+TABLES:
+- Header background: Gray 50 (#f9fafb)
+- Border: 1px solid Gray 200 (#e5e7eb)
+- Row hover: Gray 50 (#f9fafb)
+- Cell padding: 12px 16px
+- Font: 14px
+
+ICONS:
+- Default size: 20px
+- Small: 16px
+- Large: 24px
+- Color: Inherit from parent text color
+- Style: Outline for most cases, filled for active states
+
+ANIMATIONS:
+- Transition duration: 150ms for micro-interactions
+- Transition duration: 300ms for state changes
+- Easing: cubic-bezier(0.4, 0, 0.2, 1)
+- Hover effects should be subtle and instant
+- Loading animations should loop smoothly
+    `.trim();
+
+    let isLoading = false;
+    let lastMessageTime = 0;
+    const MIN_MESSAGE_INTERVAL = 1000; // 1 second between messages
+
+    // Secure utility function for creating DOM elements
+    function createSecureElement(tag, className, textContent) {
+      const element = document.createElement(tag);
+      if (className) {
+        element.className = className;
+      }
+      if (textContent) {
+        element.textContent = textContent; // Always use textContent, never innerHTML
+      }
+      return element;
+    }
+
+    // Secure message posting function
+    function securePostMessage(message) {
+      // Use specific origin instead of '*'
+      const targetOrigin = 'https://www.figma.com';
+      if (window.parent) {
+        window.parent.postMessage({ pluginMessage: message }, targetOrigin);
+      }
+    }
+
+    // Secure fillInput function with validation
+    function fillInput(text) {
+      console.log('fillInput called with:', text);
+
+      // Validate input
+      if (typeof text !== 'string' || text.length > 1000) {
+        console.warn('Invalid input text');
+        return;
+      }
+
+      const input = document.getElementById('message-input');
+      if (input) {
+        input.value = text;
+        input.focus();
+        console.log('Input filled successfully');
+      } else {
+        console.error('Input not found');
+      }
+    }
+
+    // Secure sendMessage function with rate limiting and validation
+    function sendMessage() {
+      const now = Date.now();
+      if (now - lastMessageTime < MIN_MESSAGE_INTERVAL) {
+        console.warn('Rate limit: Please wait before sending another message');
+        return;
+      }
+
+      console.log('sendMessage called');
+      const input = document.getElementById('message-input');
+      if (!input) {
+        console.error('Input not found');
+        return;
+      }
+
+      const message = input.value.trim();
+      if (!message || message.length > 1000) {
+        console.log('Invalid message');
+        return;
+      }
+
+      if (isLoading) {
+        console.log('Already processing');
+        return;
+      }
+
+      lastMessageTime = now;
+      console.log('Processing message:', message);
+
+      addMessage('user', message);
+      input.value = '';
+
+      showLoading();
+      isLoading = true;
+
+      setTimeout(() => {
+        const response = generateSimpleResponse(message);
+        hideLoading();
+        addMessage('ai', response);
+        isLoading = false;
+      }, 1000);
+    }
+
+    // Smart knowledge base search function
+    function searchKnowledgeBase(question, keywords) {
+      const lowerKnowledge = DESIGN_SYSTEM_KNOWLEDGE.toLowerCase();
+      const lowerQuestion = question.toLowerCase();
+
+      // Find the most relevant section
+      let bestMatch = '';
+      let bestScore = 0;
+
+      // Split knowledge base into sections
+      const sections = DESIGN_SYSTEM_KNOWLEDGE.split(/(?=^[A-Z][A-Z\s]+:)/m);
+
+      for (const section of sections) {
+        if (section.trim() === '') continue;
+
+        let score = 0;
+        const lowerSection = section.toLowerCase();
+
+        // Score based on keyword matches
+        for (const keyword of keywords) {
+          const keywordCount = (lowerSection.match(new RegExp(keyword, 'g')) || []).length;
+          score += keywordCount * 10;
+        }
+
+        // Bonus for section header match
+        const lines = section.split('\n');
+        const header = lines[0] || '';
+        for (const keyword of keywords) {
+          if (header.toLowerCase().includes(keyword)) {
+            score += 50;
+          }
+        }
+
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = section;
+        }
+      }
+
+      return bestScore > 0 ? bestMatch.trim() : '';
+    }
+
+    // Extract relevant information and format it nicely
+    function formatKnowledgeResponse(rawContent, topic) {
+      if (!rawContent) return '';
+
+      const lines = rawContent.split('\n').filter(line => line.trim() !== '');
+      let formatted = '';
+      let emoji = '💡';
+
+      // Choose appropriate emoji based on topic
+      if (topic.includes('color')) emoji = '🎨';
+      else if (topic.includes('button')) emoji = '🔘';
+      else if (topic.includes('spacing') || topic.includes('margin') || topic.includes('padding')) emoji = '📏';
+      else if (topic.includes('typography') || topic.includes('font') || topic.includes('text')) emoji = '✏️';
+      else if (topic.includes('grid') || topic.includes('layout')) emoji = '📐';
+      else if (topic.includes('card')) emoji = '🃏';
+      else if (topic.includes('accessibility') || topic.includes('a11y')) emoji = '♿';
+      else if (topic.includes('error')) emoji = '🔴';
+      else if (topic.includes('icon')) emoji = '🎯';
+      else if (topic.includes('modal')) emoji = '🪟';
+      else if (topic.includes('table')) emoji = '📊';
+      else if (topic.includes('form')) emoji = '📝';
+      else if (topic.includes('animation')) emoji = '✨';
+
+      // Format the response
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Main section headers
+        if (line.match(/^[A-Z][A-Z\s]+:$/)) {
+          formatted += `${emoji} **${line.replace(':', '')}:**\n\n`;
+        }
+        // Sub-section headers
+        else if (line.match(/^[A-Z][^:]*:$/) && !line.includes(' - ')) {
+          formatted += `**${line.replace(':', '')}:**\n`;
+        }
+        // Bullet points and content
+        else if (line.startsWith('- ')) {
+          formatted += `• ${line.substring(2)}\n`;
+        }
+        // Regular content
+        else if (line.trim() !== '') {
+          formatted += `${line}\n`;
+        }
+
+        // Add spacing between sections
+        if (line.match(/^[A-Z][A-Z\s]+:$/) && i < lines.length - 1) {
+          formatted += '\n';
+        }
+      }
+
+      return formatted.trim() + '\n\n💡 Need more details about any of these specifications? Just ask!';
+    }
+
+    function generateSimpleResponse(question) {
+      // Validate input
+      if (typeof question !== 'string' || question.length > 1000) {
+        return 'Invalid question format.';
+      }
+
+      const lowerQuestion = question.toLowerCase();
+
+      // Extract keywords from the question
+      const keywords = lowerQuestion
+        .replace(/[^\w\s]/g, ' ')
+        .split(/\s+/)
+        .filter(word => word.length > 2)
+        .filter(word => !['the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day', 'get', 'has', 'him', 'his', 'how', 'man', 'new', 'now', 'old', 'see', 'two', 'way', 'who', 'boy', 'did', 'its', 'let', 'put', 'say', 'she', 'too', 'use'].includes(word));
+
+      // First, try to find specific formatted responses for common questions
+      if (lowerQuestion.includes('error') && lowerQuestion.includes('color')) {
+        const knowledgeMatch = searchKnowledgeBase(question, ['error', 'red']);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, 'error color');
+        }
+      }
+
+      if (lowerQuestion.includes('button') && (lowerQuestion.includes('guideline') || lowerQuestion.includes('component'))) {
+        const knowledgeMatch = searchKnowledgeBase(question, ['button', 'primary', 'secondary']);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, 'button');
+        }
+      }
+
+      if (lowerQuestion.includes('spacing') && (lowerQuestion.includes('margin') || lowerQuestion.includes('scale'))) {
+        const knowledgeMatch = searchKnowledgeBase(question, ['spacing', 'margin', 'padding']);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, 'spacing');
+        }
+      }
+
+      if (lowerQuestion.includes('typography') && lowerQuestion.includes('hierarchy')) {
+        const knowledgeMatch = searchKnowledgeBase(question, ['typography', 'font', 'heading']);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, 'typography');
+        }
+      }
+
+      // General intelligent search through knowledge base
+      if (keywords.length > 0) {
+        const knowledgeMatch = searchKnowledgeBase(question, keywords);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, keywords.join(' '));
+        }
+      }
+
+      // Fallback for general topic areas if no specific match found
+      if (lowerQuestion.includes('color')) {
+        const knowledgeMatch = searchKnowledgeBase(question, ['colors', 'primary', 'secondary']);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, 'color');
+        }
+      }
+
+      if (lowerQuestion.includes('button')) {
+        const knowledgeMatch = searchKnowledgeBase(question, ['button']);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, 'button');
+        }
+      }
+
+      if (lowerQuestion.includes('spacing') || lowerQuestion.includes('margin') || lowerQuestion.includes('padding')) {
+        const knowledgeMatch = searchKnowledgeBase(question, ['spacing']);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, 'spacing');
+        }
+      }
+
+      if (lowerQuestion.includes('typography') || lowerQuestion.includes('font') || lowerQuestion.includes('text')) {
+        const knowledgeMatch = searchKnowledgeBase(question, ['typography']);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, 'typography');
+        }
+      }
+
+      if (lowerQuestion.includes('grid') || lowerQuestion.includes('layout')) {
+        const knowledgeMatch = searchKnowledgeBase(question, ['grid']);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, 'grid');
+        }
+      }
+
+      if (lowerQuestion.includes('card')) {
+        const knowledgeMatch = searchKnowledgeBase(question, ['card']);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, 'card');
+        }
+      }
+
+      if (lowerQuestion.includes('accessibility') || lowerQuestion.includes('a11y')) {
+        const knowledgeMatch = searchKnowledgeBase(question, ['accessibility']);
+        if (knowledgeMatch) {
+          return formatKnowledgeResponse(knowledgeMatch, 'accessibility');
+        }
+      }
+
+      // Default help message if nothing matches
+      return `🎯 **I can help you with:**\n\n• **Colors:** Primary, secondary, error, success colors and usage\n• **Typography:** Font sizes, weights, and hierarchy  \n• **Components:** Buttons, forms, cards, modals, tables\n• **Spacing:** Margins, padding, and layout guidelines\n• **Grid System:** Breakpoints and responsive design\n• **Accessibility:** Contrast ratios and WCAG compliance\n\n**Try asking:**\n• "What's the primary blue color?"\n• "Show me button padding specifications"\n• "What font sizes are available?"\n• "How do I use the spacing scale?"\n\n💡 I'm here to help you with the Nova Design System!`;
+    }
+
+    // Secure addMessage function with validation
+    function addMessage(type, content) {
+      // Validate input parameters
+      if (!type || !content || typeof content !== 'string') {
+        console.warn('Invalid message parameters');
+        return;
+      }
+
+      // Sanitize type parameter
+      const validTypes = ['user', 'ai'];
+      if (!validTypes.includes(type)) {
+        console.warn('Invalid message type:', type);
+        return;
+      }
+
+      const container = document.getElementById('messages-container');
+      const welcomeState = document.getElementById('welcome-state');
+
+      if (welcomeState) {
+        welcomeState.classList.add('hidden');
+      }
+
+      // Create elements securely
+      const messageDiv = createSecureElement('div', `message ${type}`);
+      const bubbleDiv = createSecureElement('div', 'message-bubble', content);
+
+      messageDiv.appendChild(bubbleDiv);
+      container.appendChild(messageDiv);
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Secure loading indicator without innerHTML
+    function showLoading() {
+      const container = document.getElementById('messages-container');
+      const loadingDiv = createSecureElement('div', 'message ai');
+      loadingDiv.id = 'loading-indicator';
+
+      // Create loading structure without innerHTML
+      const loadingMessage = createSecureElement('div', 'loading-message');
+      const thinkingDots = createSecureElement('div', 'thinking-dots');
+
+      // Create three dots
+      for (let i = 0; i < 3; i++) {
+        const dot = createSecureElement('div', 'thinking-dot');
+        thinkingDots.appendChild(dot);
+      }
+
+      const span = createSecureElement('span', '', 'Thinking...');
+
+      loadingMessage.appendChild(thinkingDots);
+      loadingMessage.appendChild(span);
+      loadingDiv.appendChild(loadingMessage);
+
+      container.appendChild(loadingDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function hideLoading() {
+      const loadingDiv = document.getElementById('loading-indicator');
+      if (loadingDiv) {
+        loadingDiv.remove();
+      }
+    }
+
+    // Secure event handlers
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey && e.target.id === 'message-input') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Secure logo click handler with proper message posting
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoDiv = document.querySelector('.logo');
+      if (logoDiv) {
+        logoDiv.style.cursor = 'pointer';
+        logoDiv.addEventListener('click', function() {
+          securePostMessage({ type: 'reload' });
+        });
+      }
+    });
+
+    console.log('Script loaded successfully');
+  </script>
+</body>
+</html>
